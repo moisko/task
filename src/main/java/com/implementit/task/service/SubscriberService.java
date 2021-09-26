@@ -4,13 +4,11 @@ import com.implementit.task.dto.SubscriberDto;
 import com.implementit.task.dto.UpdateSubscriberDto;
 import com.implementit.task.mapper.SubscriberMapper;
 import com.implementit.task.repository.SubscriberRepository;
+import com.implementit.task.validation.ValidationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
 import java.util.Objects;
 import java.util.Set;
 
@@ -19,11 +17,11 @@ import static java.util.stream.Collectors.toSet;
 @Service
 public class SubscriberService {
     private final SubscriberRepository subscriberRepository;
-    private final Validator validator;
+    private final ValidationService validationService;
 
-    public SubscriberService(SubscriberRepository subscriberRepository, Validator validator) {
+    public SubscriberService(SubscriberRepository subscriberRepository, ValidationService validationService) {
         this.subscriberRepository = subscriberRepository;
-        this.validator = validator;
+        this.validationService = validationService;
     }
 
     @Transactional(readOnly = true)
@@ -43,14 +41,7 @@ public class SubscriberService {
 
     @Transactional
     public SubscriberDto registerSubscriber(SubscriberDto subscriberDto) {
-        Set<ConstraintViolation<SubscriberDto>> violations = validator.validate(subscriberDto);
-        if (!violations.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (ConstraintViolation<SubscriberDto> constraintViolation : violations) {
-                sb.append(constraintViolation.getMessage());
-            }
-            throw new ConstraintViolationException("Error occurred: " + sb.toString(), violations);
-        }
+        validationService.validate(subscriberDto);
         return SubscriberMapper.INSTANCE.toDto(
                 subscriberRepository.save(SubscriberMapper.INSTANCE.toEntity(subscriberDto, Set.of()))
         );
@@ -63,14 +54,7 @@ public class SubscriberService {
 
     @Transactional
     public SubscriberDto updateSubscriber(UpdateSubscriberDto updateSubscriberDto) {
-        Set<ConstraintViolation<UpdateSubscriberDto>> violations = validator.validate(updateSubscriberDto);
-        if (!violations.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (ConstraintViolation<UpdateSubscriberDto> constraintViolation : violations) {
-                sb.append(constraintViolation.getMessage());
-            }
-            throw new ConstraintViolationException("Error occurred: " + sb.toString(), violations);
-        }
+        validationService.validate(updateSubscriberDto);
         return subscriberRepository.findById(updateSubscriberDto.getId())
                 .map(subscriber -> {
                     boolean shouldUpdate = false;

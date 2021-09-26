@@ -5,13 +5,11 @@ import com.implementit.task.dto.UpdateProductDto;
 import com.implementit.task.mapper.ProductMapper;
 import com.implementit.task.model.Subscriber;
 import com.implementit.task.repository.ProductRepository;
+import com.implementit.task.validation.ValidationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
@@ -19,11 +17,11 @@ import static java.util.stream.Collectors.toSet;
 @Service
 public class ProductService {
     private final ProductRepository productRepository;
-    private final Validator validator;
+    private final ValidationService validationService;
 
-    public ProductService(ProductRepository productRepository, Validator validator) {
+    public ProductService(ProductRepository productRepository, ValidationService validationService) {
         this.productRepository = productRepository;
-        this.validator = validator;
+        this.validationService = validationService;
     }
 
     @Transactional(readOnly = true)
@@ -43,14 +41,7 @@ public class ProductService {
 
     @Transactional
     public ProductDto addProduct(ProductDto productDto) {
-        Set<ConstraintViolation<ProductDto>> violations = validator.validate(productDto);
-        if (!violations.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (ConstraintViolation<ProductDto> constraintViolation : violations) {
-                sb.append(constraintViolation.getMessage());
-            }
-            throw new ConstraintViolationException("Error occurred: " + sb.toString(), violations);
-        }
+        validationService.validate(productDto);
         return ProductMapper.INSTANCE.toDto(
                 productRepository.save(ProductMapper.INSTANCE.toEntity(productDto))
         );
@@ -68,14 +59,7 @@ public class ProductService {
 
     @Transactional
     public ProductDto updateProduct(UpdateProductDto updateProductDto) {
-        Set<ConstraintViolation<UpdateProductDto>> violations = validator.validate(updateProductDto);
-        if (!violations.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (ConstraintViolation<UpdateProductDto> constraintViolation : violations) {
-                sb.append(constraintViolation.getMessage());
-            }
-            throw new ConstraintViolationException("Error occurred: " + sb.toString(), violations);
-        }
+        validationService.validate(updateProductDto);
         return productRepository.findById(updateProductDto.getId())
                 .map(product -> {
                     boolean shouldUpdate = false;
