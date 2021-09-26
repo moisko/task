@@ -72,6 +72,29 @@ class ProductServiceSpec extends Specification {
         savedProduct.available == Boolean.TRUE
     }
 
+    def "should add a new product to subscriber's cart"() {
+        given: "an existing product"
+        Product product = productRepository.save(new Product(
+                name: "Lie Nielsen plane 164",
+                available: Boolean.TRUE,
+        ))
+        and: "an existing subscriber"
+        Subscriber subscriber = subscriberRepository.save(new Subscriber(
+                firstName: 'John',
+                lastName: 'Doe',
+        ))
+        and: "the product is added to subscriber's cart"
+        product.addSubscriber(subscriber)
+        subscriberRepository.save(subscriber)
+
+        when: "a request to fetch all products for that subscriber is made"
+        Set<ProductDto> products = productService.fetchAllBySubscriberId(subscriber.id)
+
+        then: "the correct set of products is returned"
+        products.size() == 1
+        products.findIndexOf { it.name == "Lie Nielsen plane 164" } != -1
+    }
+
     def "should throw an exception if an attempt to add an invalid product is made"() {
         when: "a request to add an invalid product is made"
         productService.addProduct(new ProductDto(

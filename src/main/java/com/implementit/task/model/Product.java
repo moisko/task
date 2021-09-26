@@ -28,6 +28,16 @@ public class Product implements Serializable {
     @ManyToMany(mappedBy = "products")
     private Set<Subscriber> subscribers = new HashSet<>();
 
+    public void addSubscriber(Subscriber subscriber) {
+        this.subscribers.add(subscriber);
+        subscriber.getProducts().add(this);
+    }
+
+    public void removeSubscriber(Subscriber subscriber) {
+        this.subscribers.remove(subscriber);
+        subscriber.getProducts().remove(this);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {

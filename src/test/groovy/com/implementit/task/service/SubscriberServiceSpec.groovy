@@ -33,11 +33,9 @@ class SubscriberServiceSpec extends Specification {
         Subscriber subscriber = subscriberRepository.save(new Subscriber(
                 firstName: 'John',
                 lastName: 'Doe',
-                createdDate: LocalDateTime.now(),
                 products: [
                         new Product(
                                 name: "Lie Nielsen plane 164",
-                                createdDate: LocalDateTime.now(),
                                 available: Boolean.TRUE,
                                 subscribers: [] as Set
                         )
@@ -73,15 +71,11 @@ class SubscriberServiceSpec extends Specification {
         Subscriber subscriber = subscriberRepository.save(new Subscriber(
                 firstName: 'John',
                 lastName: 'Doe',
-                createdDate: LocalDateTime.now(),
-                products: [] as Set
         ))
         and: "a product that the subscriber wants to buy"
         Product woodPlane = new Product(
                 name: "Lie Nielsen plane 164",
                 createdDate: LocalDateTime.now(),
-                available: Boolean.TRUE,
-                subscribers: [] as Set
         )
         and: "the product was finally purchased by the subscriber"
         subscriber.addProduct(woodPlane)
@@ -107,8 +101,6 @@ class SubscriberServiceSpec extends Specification {
         SubscriberDto subscriber = subscriberService.registerSubscriber(new SubscriberDto(
                 firstName: 'John',
                 lastName: 'Doe',
-                createdDate: LocalDateTime.now(),
-                productIds: [] as Set
         ))
 
         then: "it is successfully registered"
@@ -123,8 +115,6 @@ class SubscriberServiceSpec extends Specification {
         when: "an attempt to register a subscriber with missing first name"
         subscriberService.registerSubscriber(new SubscriberDto(
                 lastName: 'Doe',
-                createdDate: LocalDateTime.now(),
-                productIds: [] as Set
         ))
         then: "a validation exception should be thrown"
         Exception ex = thrown()
@@ -137,13 +127,11 @@ class SubscriberServiceSpec extends Specification {
         Subscriber subscriber = subscriberRepository.save(new Subscriber(
                 firstName: 'John',
                 lastName: 'Doe',
-                createdDate: LocalDateTime.now(),
                 products: [
                         new Product(
                                 name: "Lie Nielsen plane 164",
                                 createdDate: LocalDateTime.now(),
                                 available: Boolean.TRUE,
-                                subscribers: [] as Set
                         )
                 ] as Set
         ))
@@ -163,9 +151,7 @@ class SubscriberServiceSpec extends Specification {
         given: "a Lie Nielsen wood plane"
         Product handPlane = productRepository.save(new Product(
                 name: "Lie Nielsen plane 164",
-                createdDate: LocalDateTime.now(),
                 available: Boolean.TRUE,
-                subscribers: [] as Set
         ))
 
         and: "some subscribers"
@@ -173,20 +159,14 @@ class SubscriberServiceSpec extends Specification {
                 new Subscriber(
                         firstName: 'John',
                         lastName: 'Doe',
-                        createdDate: LocalDateTime.now(),
-                        products: [] as Set
                 ),
                 new Subscriber(
                         firstName: 'Chuck',
                         lastName: 'Norris',
-                        createdDate: LocalDateTime.now(),
-                        products: [] as Set
                 ),
                 new Subscriber(
                         firstName: 'Jamy',
                         lastName: 'Raegen',
-                        createdDate: LocalDateTime.now(),
-                        products: [] as Set
                 )
         ])
 
@@ -213,8 +193,6 @@ class SubscriberServiceSpec extends Specification {
         Subscriber subscriber = subscriberRepository.save(new Subscriber(
                 firstName: 'John',
                 lastName: 'Doe',
-                createdDate: LocalDateTime.now(),
-                products: [] as Set
         ))
 
         when: "a request to update it's first and last name is made"
